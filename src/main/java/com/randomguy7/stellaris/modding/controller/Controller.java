@@ -9,6 +9,7 @@ import com.randomguy7.stellaris.modding.model.gfx.portraits.PortraitGroup;
 import com.randomguy7.stellaris.modding.model.gfx.portraits.ScopeObject;
 import com.randomguy7.stellaris.modding.model.localisation.LocalisationTemplate;
 import javafx.event.ActionEvent;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.apache.commons.io.FileUtils;
@@ -44,6 +45,7 @@ public class Controller {
     public TextField communicationSound;
     public TextField organ;
     public TextField mouth;
+    public CheckBox gendered;
 
     public void runClick(ActionEvent event) {
         copyImagesToTarget();
@@ -76,8 +78,17 @@ public class Controller {
     }
 
     private void generatePortraitConfig() {
-        Collection<File> maleImages = FileUtils.listFiles(FileUtils.getFile(String.format(IMAGE_TARGET_PATH, target.getText(), name.getText(), "m", "")), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-        Collection<File> femaleImages = FileUtils.listFiles(FileUtils.getFile(String.format(IMAGE_TARGET_PATH, target.getText(), name.getText(), "f", "")), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+        File maleDirectory = FileUtils.getFile(String.format(IMAGE_TARGET_PATH, target.getText(), name.getText(), "m", ""));
+        Collection<File> maleImages = Collections.emptyList();
+        if (maleDirectory.isDirectory()) {
+            maleImages = FileUtils.listFiles(maleDirectory, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+        }
+
+        File femaleDirectory = FileUtils.getFile(String.format(IMAGE_TARGET_PATH, target.getText(), name.getText(), "f", ""));
+        Collection<File> femaleImages = Collections.emptyList();
+        if (femaleDirectory.isDirectory()) {
+            femaleImages = FileUtils.listFiles(femaleDirectory, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+        }
 
         List<Portrait> malePortraits = convertToPortrait(maleImages, maleSound.getText());
         List<Portrait> femalePortraits = convertToPortrait(femaleImages, femaleSound.getText());
@@ -86,7 +97,7 @@ public class Controller {
 
         ScopeObject scopeObject = new ScopeObject(malePortraits, femalePortraits);
         PortraitGroup portraitGroup = new PortraitGroup(name.getText(), defaultPortrait, scopeObject);
-        PortraitConfig portraitConfig = new PortraitConfig(Collections.singletonList(portraitGroup));
+        PortraitConfig portraitConfig = new PortraitConfig(Collections.singletonList(portraitGroup), gendered.isSelected());
         tempOutput.setText(portraitConfig.portraitConfigString());
         try {
             FileUtils.write(new File(target.getText() + "/gfx/portraits/portraits/" + name.getText() + ".txt"), tempOutput.getText(), "UTF-8");
@@ -97,7 +108,7 @@ public class Controller {
     }
 
     private void generateSpeciesClass(List<PortraitGroup> portraitGroups) {
-        SpeciesClass speciesClass = new SpeciesClass(name.getText(), portraitGroups, graphicalCulture.getText(), Archetype.BIOLOGICAL, true);
+        SpeciesClass speciesClass = new SpeciesClass(name.getText(), portraitGroups, graphicalCulture.getText(), Archetype.BIOLOGICAL, gendered.isSelected());
         try {
             FileUtils.write(new File(target.getText() + "/common/species_classes/" + name.getText() + ".txt"), speciesClass.speciesClassString(), "UTF-8");
         } catch (IOException e) {

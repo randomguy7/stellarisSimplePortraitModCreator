@@ -5,9 +5,11 @@ import java.util.List;
 
 public class PortraitConfig {
     private List<PortraitGroup> portraitGroups;
+    private boolean gendered;
 
-    public PortraitConfig(List<PortraitGroup> portraitGroups) {
+    public PortraitConfig(List<PortraitGroup> portraitGroups, boolean gendered) {
         this.portraitGroups = portraitGroups;
+        this.gendered = gendered;
     }
 
     public List<PortraitGroup> getPortraitGroups() {
@@ -27,7 +29,7 @@ public class PortraitConfig {
 
     private StringBuilder appendPortraitGroups(StringBuilder builder, List<PortraitGroup> portraitGroups) {
         builder.append("portrait_groups = {").append(System.lineSeparator());
-        portraitGroups.forEach(portraitGroup -> builder.append(portraitGroup.groupString()));
+        portraitGroups.forEach(portraitGroup -> builder.append(portraitGroup.groupString(gendered)));
         builder.append("}").append(System.lineSeparator());
         return builder;
     }

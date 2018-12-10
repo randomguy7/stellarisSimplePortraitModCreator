@@ -37,12 +37,12 @@ public class PortraitGroup {
         this.scopeObject = scopeObject;
     }
 
-    public String groupString() {
+    public String groupString(boolean gendered) {
         StringBuilder builder = new StringBuilder();
         builder.append(name).append(" = {").append(System.lineSeparator());
         builder.append("default = ").append(defaultPortrait.getIdentifier()).append(System.lineSeparator());
         for (Scope scope : Scope.values()) {
-            appendScope(builder, true, scope);
+            appendScope(builder, gendered, scope);
         }
         builder.append("}").append(System.lineSeparator());
         return builder.toString();
